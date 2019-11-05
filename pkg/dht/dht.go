@@ -83,6 +83,9 @@ func encodeInfoHash(infoHash string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	if len(h) != 20 {
+		return "", fmt.Errorf("invalid infoHash %q: needs to represent 20 bytes", infoHash)
+	}
 	return string(h), nil
 }
 
