@@ -26,7 +26,7 @@ func Ping(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("%#v\n", resp)
+	fmt.Printf("%v\n", resp)
 	return nil
 }
 
@@ -48,7 +48,7 @@ func FindNode(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("%#v\n", resp)
+	fmt.Printf("%v\n", resp)
 	return nil
 }
 
@@ -70,6 +70,6 @@ func GetPeers(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("%#v\n", resp)
+	fmt.Printf("%v\n", resp)
 	return nil
 }

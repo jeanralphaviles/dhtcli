@@ -12,7 +12,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "dhtcli"
 	app.Usage = "Query and interact with the BitTorrent Distributed Hash Table."
-	app.Version = "0.0.1"
+	app.Version = "0.0.2"
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "bootstrap, b",
