@@ -134,3 +134,51 @@ func TestGetPeers(t *testing.T) {
 		}
 	}
 }
+
+func TestAnnouncePeer(t *testing.T) {
+	d, err := New()
+	if err != nil {
+		t.Fatalf("error creating new DHT object: %v", err)
+	}
+	cases := []struct {
+		port int
+	}{
+		{0},
+		{6881},
+	}
+	for n, c := range cases {
+		got, err := d.AnnouncePeer(*addr, "4142434445464748494A4B4C4D4E4F5051525354", "746F6B656E", c.port)
+		if err != nil {
+			t.Fatalf("case %d: error issuing AnnouncePeer request: %v", n, err)
+		}
+		impliedPort := 0
+		if c.port == 0 {
+			impliedPort = 1
+		}
+		want, err := newRequest(announcePeer, map[string]interface{}{
+			"id":           d.id,
+			"implied_port": int64(impliedPort),
+			"info_hash":    "ABCDEFGHIJKLMNOPQRST",
+			"port":         int64(c.port),
+			"token":        "token",
+		})
+		// Set transaction ids to be equal
+		want.TransactionID = got.TransactionID
+		if !reflect.DeepEqual(want, got) {
+			t.Errorf("case %d: expected %v, got %v", n, want, got)
+		}
+	}
+
+	errCases := []struct {
+		infoHash string
+		token    string
+	}{
+		{"4142434445464748494A4B4C4D4E4F5051525354", "ABCDEFG"},
+		{"ABCDEFG", "746F6B656E"},
+	}
+	for n, c := range errCases {
+		if _, err := d.AnnouncePeer(*addr, c.infoHash, c.token, 0); err == nil {
+			t.Errorf("case %d: expected d.AnnouncePeer(%v, %q, %q) to error", n, addr, c.infoHash, c.token)
+		}
+	}
+}

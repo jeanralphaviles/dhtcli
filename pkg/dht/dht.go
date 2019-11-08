@@ -61,8 +61,7 @@ func (d *DHT) Ping(server net.UDPAddr) (*Message, error) {
 	return d.query(server, req)
 }
 
-// encodeInfoHash encodes a string of hexadecimal characters as a string of the
-// literal bytes it represents.
+// encodeInfoHash encodes a string of hexadecimal characters as a string of the literal bytes it represents.
 func encodeInfoHash(infoHash string) (string, error) {
 	h, err := hex.DecodeString(infoHash)
 	if err != nil {
@@ -98,6 +97,47 @@ func (d *DHT) GetPeers(server net.UDPAddr, infoHash string) (*Message, error) {
 	req, err := newRequest(getPeers, args)
 	if err != nil {
 		return nil, fmt.Errorf("error creating get_peers request: %v", err)
+	}
+	return d.query(server, req)
+}
+
+// encodeToken encodes a string of hexadecimal characters of a token as the literal bytes it represents.
+func encodeToken(token string) (string, error) {
+	h, err := hex.DecodeString(token)
+	if err != nil {
+		return "", err
+	}
+	return string(h), nil
+}
+
+// AnnouncePeer issues an "announce_peer" query to a DHT node and returns its response.
+//
+// infoHash is the hash of the torrent to announce as a peer of.
+// token is the token received in a previous get_peers request to this server.
+// port is the intended server port of this peer. If zero, the "implied_port" setting will be sent in the request.
+func (d *DHT) AnnouncePeer(server net.UDPAddr, infoHash string, token string, port int) (*Message, error) {
+	infoHash, err := encodeInfoHash(infoHash)
+	if err != nil {
+		return nil, fmt.Errorf("error encoding infoHash: %v", err)
+	}
+	token, err = encodeToken(token)
+	if err != nil {
+		return nil, fmt.Errorf("error encoding token: %v", err)
+	}
+	impliedPort := 0
+	if port == 0 {
+		impliedPort = 1
+	}
+	args := map[string]interface{}{
+		"id":           d.id,
+		"implied_port": impliedPort,
+		"info_hash":    infoHash,
+		"port":         port,
+		"token":        token,
+	}
+	req, err := newRequest(announcePeer, args)
+	if err != nil {
+		return nil, fmt.Errorf("error creating announce_peer request: %v", err)
 	}
 	return d.query(server, req)
 }
