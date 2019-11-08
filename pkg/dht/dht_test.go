@@ -40,13 +40,16 @@ func init() {
 }
 
 func TestPing(t *testing.T) {
-	d := DHT{id: "abc123"}
+	d, err := New()
+	if err != nil {
+		t.Fatalf("error creating new DHT object: %v", err)
+	}
 	got, err := d.Ping(*addr)
 	if err != nil {
 		t.Fatalf("error issuing Ping: %v", err)
 	}
 	want, err := newRequest(ping, map[string]interface{}{
-		"id": "abc123",
+		"id": d.id,
 	})
 	if err != nil {
 		t.Fatalf("error creating Ping request: %v", err)
@@ -59,13 +62,16 @@ func TestPing(t *testing.T) {
 }
 
 func TestFindNode(t *testing.T) {
-	d := DHT{id: "abc123"}
+	d, err := New()
+	if err != nil {
+		t.Fatalf("error creating new DHT object: %v", err)
+	}
 	got, err := d.FindNode(*addr, "4142434445464748494A4B4C4D4E4F5051525354")
 	if err != nil {
 		t.Fatalf("error issuing FindNode: %v", err)
 	}
 	want, err := newRequest(findNode, map[string]interface{}{
-		"id":     "abc123",
+		"id":     d.id,
 		"target": "ABCDEFGHIJKLMNOPQRST",
 	})
 	if err != nil {
@@ -76,16 +82,33 @@ func TestFindNode(t *testing.T) {
 	if !reflect.DeepEqual(want, got) {
 		t.Errorf("expected %v, got %v", want, got)
 	}
+
+	errCases := []struct {
+		addr   *net.UDPAddr
+		target string
+	}{
+		{addr, "ABCDEFG"},
+		{addr, "12"},
+		{&net.UDPAddr{Port: 0}, "4142434445464748494A4B4C4D4E4F5051525354"},
+	}
+	for n, c := range errCases {
+		if _, err := d.FindNode(*c.addr, c.target); err == nil {
+			t.Errorf("case %d: d.FindNode(%v, %q) did not error", n, c.addr, c.target)
+		}
+	}
 }
 
 func TestGetPeers(t *testing.T) {
-	d := DHT{id: "abc123"}
+	d, err := New()
+	if err != nil {
+		t.Fatalf("error creating new DHT object: %v", err)
+	}
 	got, err := d.GetPeers(*addr, "4142434445464748494A4B4C4D4E4F5051525354")
 	if err != nil {
 		t.Fatalf("error issuing GetPeers: %v", err)
 	}
 	want, err := newRequest(getPeers, map[string]interface{}{
-		"id":        "abc123",
+		"id":        d.id,
 		"info_hash": "ABCDEFGHIJKLMNOPQRST",
 	})
 	if err != nil {
@@ -95,5 +118,19 @@ func TestGetPeers(t *testing.T) {
 	want.TransactionID = got.TransactionID
 	if !reflect.DeepEqual(want, got) {
 		t.Errorf("expected %v, got %v", want, got)
+	}
+
+	errCases := []struct {
+		addr   *net.UDPAddr
+		target string
+	}{
+		{addr, "ABCDEFG"},
+		{addr, "12"},
+		{&net.UDPAddr{Port: 0}, "4142434445464748494A4B4C4D4E4F5051525354"},
+	}
+	for n, c := range errCases {
+		if _, err := d.GetPeers(*c.addr, c.target); err == nil {
+			t.Errorf("case %d: d.GetPeers(%v, %q) did not error", n, c.addr, c.target)
+		}
 	}
 }

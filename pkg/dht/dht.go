@@ -97,7 +97,7 @@ func (d *DHT) GetPeers(server net.UDPAddr, infoHash string) (*Message, error) {
 	args := map[string]interface{}{"id": d.id, "info_hash": infoHash}
 	req, err := newRequest(getPeers, args)
 	if err != nil {
-		return nil, fmt.Errorf("error creating geep_peers request: %v", err)
+		return nil, fmt.Errorf("error creating get_peers request: %v", err)
 	}
 	return d.query(server, req)
 }
