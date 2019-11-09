@@ -74,26 +74,30 @@ func (m *Message) String() string {
 	// Translate byte strings to hex for better readability.
 	c.TransactionID = fmt.Sprintf("0x%x", c.TransactionID)
 	c.Version = fmt.Sprintf("0x%x", c.Version)
-	for _, dict := range []map[string]interface{}{c.Arguments, c.Response} {
-		for k, v := range dict {
+
+	f := func(src, dest map[string]interface{}) {
+		for k, v := range src {
 			switch k {
 			case "nodes":
 				n, err := parseCompactNodesEncoding([]byte(v.(string)))
 				if err != nil {
 					log.Print(err)
 				}
-				dict["nodes"] = n
+				dest["nodes"] = n
 			case "values":
 				p, err := parseCompactPeersEncoding(v.([]interface{}))
 				if err != nil {
 					log.Print(err)
 				}
-				dict["values"] = p
+				dest["values"] = p
 			default:
-				dict[k] = fmt.Sprintf("0x%x", v)
+				dest[k] = fmt.Sprintf("0x%x", v)
 			}
 		}
 	}
+
+	f(m.Arguments, c.Arguments)
+	f(m.Response, c.Response)
 
 	b, err := json.MarshalIndent(c, "", "  ")
 	if err != nil {
