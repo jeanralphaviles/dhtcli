@@ -126,7 +126,7 @@ func TestGetPeers(t *testing.T) {
 	}{
 		{addr, "ABCDEFG"},
 		{addr, "12"},
-		{&net.UDPAddr{Port: 0}, "4142434445464748494A4B4C4D4E4F5051525354"},
+		{&net.UDPAddr{Port: 65536}, "4142434445464748494A4B4C4D4E4F5051525354"},
 	}
 	for n, c := range errCases {
 		if _, err := d.GetPeers(*c.addr, c.target); err == nil {
