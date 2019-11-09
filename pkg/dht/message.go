@@ -40,8 +40,8 @@ type Message struct {
 	Version       string                 `bencode:"v,omitempty" json:"v,omitempty"`
 }
 
-// newRequest returns a new query message with the specified arguments.
-func newRequest(q query, args map[string]interface{}) (*Message, error) {
+// NewRequest returns a new query message with the specified arguments.
+func NewRequest(q query, args map[string]interface{}) (*Message, error) {
 	// 2 bytes recommended by BEP 5.
 	id := make([]byte, 2)
 	if _, err := rand.Read(id); err != nil {
@@ -56,8 +56,8 @@ func newRequest(q query, args map[string]interface{}) (*Message, error) {
 	}, nil
 }
 
-// newResponse returns a new response message with the specified response dictionary.
-func newResponse(id string, response map[string]interface{}) *Message {
+// NewResponse returns a new response message with the specified response dictionary.
+func NewResponse(id string, response map[string]interface{}) *Message {
 	return &Message{
 		TransactionID: id,
 		Mtype:         "r",
@@ -148,20 +148,20 @@ func (m *Message) String() string {
 
 // Node encapsulates entries in the "nodes" key in "find_node" and "get_peers" messages.
 type Node struct {
-	id   []byte
-	peer *Peer
+	ID   []byte
+	Peer *Peer
 }
 
 // MarshalJSON marshals a node object into JSON.
 func (n *Node) MarshalJSON() ([]byte, error) {
-	hash := fmt.Sprintf("0x%x", n.id)
+	hash := fmt.Sprintf("0x%x", n.ID)
 	return json.Marshal(
 		struct {
 			ID   string `json:"id"`
 			Peer *Peer  `json:"address"`
 		}{
 			hash,
-			n.peer,
+			n.Peer,
 		})
 }
 
@@ -179,8 +179,8 @@ func parseCompactNodesEncoding(b []byte) ([]Node, error) {
 			return nil, err
 		}
 		nodes = append(nodes, Node{
-			id:   id,
-			peer: peer,
+			ID:   id,
+			Peer: peer,
 		})
 	}
 	return nodes, nil

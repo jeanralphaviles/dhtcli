@@ -45,7 +45,7 @@ func (d *DHT) query(server net.UDPAddr, req *Message) (*Message, error) {
 	if _, err := conn.Write(buf.Bytes()); err != nil {
 		return nil, err
 	}
-	conn.SetReadDeadline(time.Now().Add(10 * time.Second))
+	conn.SetReadDeadline(time.Now().Add(2 * time.Second))
 	resp := &Message{}
 	if err := bencode.NewDecoder(conn).Decode(resp); err != nil {
 		return nil, fmt.Errorf("error unmarshalling response: %v", err)
@@ -58,15 +58,15 @@ func (d *DHT) query(server net.UDPAddr, req *Message) (*Message, error) {
 // server is the IP:Port of the DHT node to ping.
 func (d *DHT) Ping(server net.UDPAddr) (*Message, error) {
 	args := map[string]interface{}{"id": d.ID}
-	req, err := newRequest(ping, args)
+	req, err := NewRequest(ping, args)
 	if err != nil {
 		return nil, fmt.Errorf("error creating ping request: %v", err)
 	}
 	return d.query(server, req)
 }
 
-// encodeInfoHash encodes a string of hexadecimal characters as a string of the literal bytes it represents.
-func encodeInfoHash(infoHash string) (string, error) {
+// EncodeInfoHash encodes a string of hexadecimal characters as a string of the literal bytes it represents.
+func EncodeInfoHash(infoHash string) (string, error) {
 	infoHash = strings.TrimPrefix(infoHash, "0x")
 	infoHash = strings.TrimPrefix(infoHash, "0X")
 	h, err := hex.DecodeString(infoHash)
@@ -84,12 +84,12 @@ func encodeInfoHash(infoHash string) (string, error) {
 // server is the IP:Port of the DHT node to query.
 // target is the 20 byte hex string of the node being searched for.
 func (d *DHT) FindNode(server net.UDPAddr, target string) (*Message, error) {
-	hash, err := encodeInfoHash(target)
+	hash, err := EncodeInfoHash(target)
 	if err != nil {
 		return nil, err
 	}
 	args := map[string]interface{}{"id": d.ID, "target": hash}
-	req, err := newRequest(findNode, args)
+	req, err := NewRequest(findNode, args)
 	if err != nil {
 		return nil, fmt.Errorf("error creating find_node request: %v", err)
 	}
@@ -101,20 +101,20 @@ func (d *DHT) FindNode(server net.UDPAddr, target string) (*Message, error) {
 // server is the IP:Port of the DHT node to query.
 // infoHash is the 20 byte hexadecimal hash of the torrent to get peers for.
 func (d *DHT) GetPeers(server net.UDPAddr, infoHash string) (*Message, error) {
-	infoHash, err := encodeInfoHash(infoHash)
+	infoHash, err := EncodeInfoHash(infoHash)
 	if err != nil {
 		return nil, err
 	}
 	args := map[string]interface{}{"id": d.ID, "info_hash": infoHash}
-	req, err := newRequest(getPeers, args)
+	req, err := NewRequest(getPeers, args)
 	if err != nil {
 		return nil, fmt.Errorf("error creating get_peers request: %v", err)
 	}
 	return d.query(server, req)
 }
 
-// encodeToken encodes a string of hexadecimal characters of a token as the literal bytes it represents.
-func encodeToken(token string) (string, error) {
+// EncodeToken encodes a string of hexadecimal characters of a token as the literal bytes it represents.
+func EncodeToken(token string) (string, error) {
 	token = strings.TrimPrefix(token, "0x")
 	token = strings.TrimPrefix(token, "0X")
 	h, err := hex.DecodeString(token)
@@ -131,11 +131,11 @@ func encodeToken(token string) (string, error) {
 // token is the token received in a previous get_peers request to this server.
 // port is the intended UDP server port of this peer. If zero, the "implied_port" setting will be sent in the request.
 func (d *DHT) AnnouncePeer(server net.UDPAddr, infoHash string, token string, port int) (*Message, error) {
-	infoHash, err := encodeInfoHash(infoHash)
+	infoHash, err := EncodeInfoHash(infoHash)
 	if err != nil {
 		return nil, fmt.Errorf("error encoding infoHash: %v", err)
 	}
-	token, err = encodeToken(token)
+	token, err = EncodeToken(token)
 	if err != nil {
 		return nil, fmt.Errorf("error encoding token: %v", err)
 	}
@@ -150,7 +150,7 @@ func (d *DHT) AnnouncePeer(server net.UDPAddr, infoHash string, token string, po
 		"port":         port,
 		"token":        token,
 	}
-	req, err := newRequest(announcePeer, args)
+	req, err := NewRequest(announcePeer, args)
 	if err != nil {
 		return nil, fmt.Errorf("error creating announce_peer request: %v", err)
 	}
