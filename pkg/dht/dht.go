@@ -9,6 +9,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"net"
+	"strings"
 	"time"
 
 	"github.com/zeebo/bencode"
@@ -66,6 +67,8 @@ func (d *DHT) Ping(server net.UDPAddr) (*Message, error) {
 
 // encodeInfoHash encodes a string of hexadecimal characters as a string of the literal bytes it represents.
 func encodeInfoHash(infoHash string) (string, error) {
+	infoHash = strings.TrimPrefix(infoHash, "0x")
+	infoHash = strings.TrimPrefix(infoHash, "0X")
 	h, err := hex.DecodeString(infoHash)
 	if err != nil {
 		return "", err
@@ -112,6 +115,8 @@ func (d *DHT) GetPeers(server net.UDPAddr, infoHash string) (*Message, error) {
 
 // encodeToken encodes a string of hexadecimal characters of a token as the literal bytes it represents.
 func encodeToken(token string) (string, error) {
+	token = strings.TrimPrefix(token, "0x")
+	token = strings.TrimPrefix(token, "0X")
 	h, err := hex.DecodeString(token)
 	if err != nil {
 		return "", err
