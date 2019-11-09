@@ -1,4 +1,5 @@
 // Package dht provides methods to query the BitTorrent DHT as defined in BEP 5.
+//
 // https://www.bittorrent.org/beps/bep_0005.html
 package dht
 
@@ -16,7 +17,7 @@ import (
 // DHT encapsulates a node in the DHT.
 type DHT struct {
 	// DHT node id
-	id string
+	ID string
 }
 
 // New returns a DHT initialized with a random node id.
@@ -26,7 +27,7 @@ func New() (*DHT, error) {
 	if _, err := rand.Read(id); err != nil {
 		return nil, err
 	}
-	return &DHT{id: string(id)}, nil
+	return &DHT{ID: string(id)}, nil
 }
 
 // query issues a request to a DHT node and returns its response.
@@ -52,8 +53,10 @@ func (d *DHT) query(server net.UDPAddr, req *Message) (*Message, error) {
 }
 
 // Ping issues a "ping" query to a DHT node and returns its response.
+//
+// server is the IP:Port of the DHT node to ping.
 func (d *DHT) Ping(server net.UDPAddr) (*Message, error) {
-	args := map[string]interface{}{"id": d.id}
+	args := map[string]interface{}{"id": d.ID}
 	req, err := newRequest(ping, args)
 	if err != nil {
 		return nil, fmt.Errorf("error creating ping request: %v", err)
@@ -74,12 +77,15 @@ func encodeInfoHash(infoHash string) (string, error) {
 }
 
 // FindNode issues a "find_node" query to a DHT node and returns its response.
+//
+// server is the IP:Port of the DHT node to query.
+// target is the 20 byte hex string of the node being searched for.
 func (d *DHT) FindNode(server net.UDPAddr, target string) (*Message, error) {
 	hash, err := encodeInfoHash(target)
 	if err != nil {
 		return nil, err
 	}
-	args := map[string]interface{}{"id": d.id, "target": hash}
+	args := map[string]interface{}{"id": d.ID, "target": hash}
 	req, err := newRequest(findNode, args)
 	if err != nil {
 		return nil, fmt.Errorf("error creating find_node request: %v", err)
@@ -88,12 +94,15 @@ func (d *DHT) FindNode(server net.UDPAddr, target string) (*Message, error) {
 }
 
 // GetPeers issues a "get_peers" query to a DHT node and returns its response.
+//
+// server is the IP:Port of the DHT node to query.
+// infoHash is the 20 byte hexadecimal hash of the torrent to get peers for.
 func (d *DHT) GetPeers(server net.UDPAddr, infoHash string) (*Message, error) {
 	infoHash, err := encodeInfoHash(infoHash)
 	if err != nil {
 		return nil, err
 	}
-	args := map[string]interface{}{"id": d.id, "info_hash": infoHash}
+	args := map[string]interface{}{"id": d.ID, "info_hash": infoHash}
 	req, err := newRequest(getPeers, args)
 	if err != nil {
 		return nil, fmt.Errorf("error creating get_peers request: %v", err)
@@ -112,9 +121,10 @@ func encodeToken(token string) (string, error) {
 
 // AnnouncePeer issues an "announce_peer" query to a DHT node and returns its response.
 //
-// infoHash is the hash of the torrent to announce as a peer of.
+// server is the IP:Port of the DHT node to announce as a peer to.
+// infoHash is the 20 byte hexadecimal hash of the torrent to announce as a peer of.
 // token is the token received in a previous get_peers request to this server.
-// port is the intended server port of this peer. If zero, the "implied_port" setting will be sent in the request.
+// port is the intended UDP server port of this peer. If zero, the "implied_port" setting will be sent in the request.
 func (d *DHT) AnnouncePeer(server net.UDPAddr, infoHash string, token string, port int) (*Message, error) {
 	infoHash, err := encodeInfoHash(infoHash)
 	if err != nil {
@@ -129,7 +139,7 @@ func (d *DHT) AnnouncePeer(server net.UDPAddr, infoHash string, token string, po
 		impliedPort = 1
 	}
 	args := map[string]interface{}{
-		"id":           d.id,
+		"id":           d.ID,
 		"implied_port": impliedPort,
 		"info_hash":    infoHash,
 		"port":         port,

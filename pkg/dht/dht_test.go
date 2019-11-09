@@ -49,7 +49,7 @@ func TestPing(t *testing.T) {
 		t.Fatalf("error issuing Ping: %v", err)
 	}
 	want, err := newRequest(ping, map[string]interface{}{
-		"id": d.id,
+		"id": d.ID,
 	})
 	if err != nil {
 		t.Fatalf("error creating Ping request: %v", err)
@@ -71,7 +71,7 @@ func TestFindNode(t *testing.T) {
 		t.Fatalf("error issuing FindNode: %v", err)
 	}
 	want, err := newRequest(findNode, map[string]interface{}{
-		"id":     d.id,
+		"id":     d.ID,
 		"target": "ABCDEFGHIJKLMNOPQRST",
 	})
 	if err != nil {
@@ -108,7 +108,7 @@ func TestGetPeers(t *testing.T) {
 		t.Fatalf("error issuing GetPeers: %v", err)
 	}
 	want, err := newRequest(getPeers, map[string]interface{}{
-		"id":        d.id,
+		"id":        d.ID,
 		"info_hash": "ABCDEFGHIJKLMNOPQRST",
 	})
 	if err != nil {
@@ -156,7 +156,7 @@ func TestAnnouncePeer(t *testing.T) {
 			impliedPort = 1
 		}
 		want, err := newRequest(announcePeer, map[string]interface{}{
-			"id":           d.id,
+			"id":           d.ID,
 			"implied_port": int64(impliedPort),
 			"info_hash":    "ABCDEFGHIJKLMNOPQRST",
 			"port":         int64(c.port),

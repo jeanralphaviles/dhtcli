@@ -14,6 +14,8 @@ import (
 
 const (
 	// Version is the arbitrary DHT client string representing dhtcli.
+	// Follows the "Peer ID Convention" set forth in BEP 20 with a previously unused client implementation string.
+	// https://www.bittorrent.org/beps/bep_0020.html
 	Version = "-DC0001-"
 )
 

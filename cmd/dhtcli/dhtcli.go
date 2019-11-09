@@ -43,7 +43,7 @@ func main() {
 			Name:      "announce_peer",
 			Usage:     "Issue a DHT 'announce_peer' request to the given node",
 			ArgsUsage: "host:port info_hash",
-			Description: "Announce this ip:port to a DHT node as a peer for the torrent with the given info_hash. \n\n" +
+			Description: "Announce this IP:Port to a DHT node as a peer for the torrent with the given info_hash. \n\n" +
 				"   This request requires a token received from the node in a previous get_peers request. " +
 				"This token is used to prevent malicious hosts from signing up other hosts for torrents. " +
 				"If --token is not specified, one will be obtained by issuing a get_peers request to the node. \n\n" +
