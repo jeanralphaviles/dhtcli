@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/jeanralphaviles/dhtcli/internal/actions"
+	"github.com/jeanralphaviles/dhtcli/internal/query"
 	"log"
 	"os"
 
@@ -29,7 +29,7 @@ func main() {
 					Name:      "ping",
 					Usage:     "Issue a DHT 'ping' to the given node",
 					ArgsUsage: "host:port",
-					Action:    actions.Ping,
+					Action:    query.Ping,
 					Description: "The most basic query is ping.\n\n" +
 						"   A server should respond with a single key \"id\", " +
 						"containing the queried node's ID.",
@@ -43,7 +43,7 @@ func main() {
 						"   When a node receives a find node query, it should respond " +
 						"with a key \"nodes\" containing information for the target " +
 						"node, or the closest K nodes to the target.",
-					Action: actions.FindNode,
+					Action: query.FindNode,
 				},
 				cli.Command{
 					Name:      "get_peers",
@@ -60,7 +60,7 @@ func main() {
 						"   In either case, a \"token\" key is also included in the " +
 						"return value. This token value is required for a future " +
 						"announce_peer query.",
-					Action: actions.GetPeers,
+					Action: query.GetPeers,
 				},
 				cli.Command{
 					Name:      "announce_peer",
@@ -88,7 +88,7 @@ func main() {
 							Value: 0,
 						},
 					},
-					Action: actions.AnnouncePeer,
+					Action: query.AnnouncePeer,
 				},
 			},
 		},

@@ -1,5 +1,5 @@
-// Package actions provides handlers for dhtcli commands.
-package actions
+// Package query provides handlers for dhtcli query commands.
+package query
 
 import (
 	"fmt"
