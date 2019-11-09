@@ -67,7 +67,6 @@ func newResponse(id string, response map[string]interface{}) *Message {
 
 // String pretty prints a message as JSON.
 func (m *Message) String() string {
-	// TODO(jeanralphaviles): cleanup this garbage.
 	c := &Message{}
 	if err := deepcopy.Copy(c, m); err != nil {
 		log.Printf("error copying %#v", m)
@@ -75,52 +74,25 @@ func (m *Message) String() string {
 	// Translate byte strings to hex for better readability.
 	c.TransactionID = fmt.Sprintf("0x%x", c.TransactionID)
 	c.Version = fmt.Sprintf("0x%x", c.Version)
-	if id, ok := m.Arguments["id"]; ok {
-		c.Arguments["id"] = fmt.Sprintf("0x%x", id)
-	}
-	if id, ok := m.Response["id"]; ok {
-		c.Response["id"] = fmt.Sprintf("0x%x", id)
-	}
-	if target, ok := m.Arguments["target"]; ok {
-		c.Arguments["target"] = fmt.Sprintf("0x%x", target)
-	}
-	if target, ok := m.Response["target"]; ok {
-		c.Response["target"] = fmt.Sprintf("0x%x", target)
-	}
-	if token, ok := m.Arguments["token"]; ok {
-		c.Arguments["token"] = fmt.Sprintf("0x%x", token)
-	}
-	if token, ok := m.Response["token"]; ok {
-		c.Response["token"] = fmt.Sprintf("0x%x", token)
-	}
-	if nodes, ok := m.Arguments["nodes"]; ok {
-		n, err := parseCompactNodesEncoding([]byte(nodes.(string)))
-		if err != nil {
-			log.Print(err)
+	for _, dict := range []map[string]interface{}{c.Arguments, c.Response} {
+		for k, v := range dict {
+			switch k {
+			case "nodes":
+				n, err := parseCompactNodesEncoding([]byte(v.(string)))
+				if err != nil {
+					log.Print(err)
+				}
+				dict["nodes"] = n
+			case "values":
+				p, err := parseCompactPeersEncoding(v.([]interface{}))
+				if err != nil {
+					log.Print(err)
+				}
+				dict["values"] = p
+			default:
+				dict[k] = fmt.Sprintf("0x%x", v)
+			}
 		}
-		c.Arguments["nodes"] = n
-	}
-	if nodes, ok := m.Response["nodes"]; ok {
-		n, err := parseCompactNodesEncoding([]byte(nodes.(string)))
-		if err != nil {
-			log.Print(err)
-		}
-		c.Response["nodes"] = n
-	}
-	// "values" returned as a list of strings, join them together first.
-	if values, ok := m.Arguments["values"]; ok {
-		v, err := parseCompactPeersEncoding(values.([]interface{}))
-		if err != nil {
-			log.Print(err)
-		}
-		c.Arguments["values"] = v
-	}
-	if values, ok := m.Response["values"]; ok {
-		v, err := parseCompactPeersEncoding(values.([]interface{}))
-		if err != nil {
-			log.Print(err)
-		}
-		c.Response["values"] = v
 	}
 
 	b, err := json.MarshalIndent(c, "", "  ")
