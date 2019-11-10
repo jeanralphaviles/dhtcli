@@ -65,6 +65,46 @@ func newResponse(id string, response map[string]interface{}) *Message {
 	}
 }
 
+// Nodes returns Node objects present in the Message.
+//
+// If the "nodes" key is present in both Arguments and Response dictionaries,
+// an error is returned.
+func (m *Message) Nodes() ([]Node, error) {
+	_, args := m.Arguments["nodes"]
+	_, resp := m.Response["nodes"]
+	if args && resp {
+		return nil, fmt.Errorf("message has \"nodes\" key present as both an argument and a response: %v", m)
+	}
+	var nodes string
+	if n, ok := m.Arguments["nodes"]; ok {
+		nodes = n.(string)
+	}
+	if n, ok := m.Response["nodes"]; ok {
+		nodes = n.(string)
+	}
+	return parseCompactNodesEncoding([]byte(nodes))
+}
+
+// Values returns Peer objects present in the Message.
+//
+// If the "values" key is present in both Arguments and Response dictionaries,
+// an error is returned.
+func (m *Message) Values() ([]Peer, error) {
+	_, args := m.Arguments["values"]
+	_, resp := m.Response["values"]
+	if args && resp {
+		return nil, fmt.Errorf("message has \"values\" key present as both an argument and a response: %v", m)
+	}
+	var values interface{}
+	if v, ok := m.Arguments["values"]; ok {
+		values = v
+	}
+	if v, ok := m.Response["values"]; ok {
+		values = v
+	}
+	return parseCompactPeersEncoding([]interface{}{values})
+}
+
 // String pretty prints a message as JSON.
 func (m *Message) String() string {
 	c := &Message{}
@@ -106,26 +146,39 @@ func (m *Message) String() string {
 	return string(b)
 }
 
-// node encapsulates entries in the "nodes" key in a "find_node" and "get_peers" messages.
-type node struct {
+// Node encapsulates entries in the "nodes" key in "find_node" and "get_peers" messages.
+type Node struct {
 	id   []byte
-	peer *peer
+	peer *Peer
+}
+
+// MarshalJSON marshals a node object into JSON.
+func (n *Node) MarshalJSON() ([]byte, error) {
+	hash := fmt.Sprintf("0x%x", n.id)
+	return json.Marshal(
+		struct {
+			ID   string `json:"id"`
+			Peer *Peer  `json:"address"`
+		}{
+			hash,
+			n.peer,
+		})
 }
 
 // parseCompactNodesEncoding parses contact information for nodes.
-func parseCompactNodesEncoding(b []byte) ([]node, error) {
+func parseCompactNodesEncoding(b []byte) ([]Node, error) {
 	buf := bytes.NewBuffer(b)
 	if buf.Len()%26 != 0 {
 		return nil, fmt.Errorf("compact encoding must be a multiple of 26 bytes long")
 	}
-	var nodes []node
+	var nodes []Node
 	for i := 0; i <= buf.Len()/26; i++ {
 		id := buf.Next(20)
 		peer, err := parseCompactPeerEncoding(buf.Next(6))
 		if err != nil {
 			return nil, err
 		}
-		nodes = append(nodes, node{
+		nodes = append(nodes, Node{
 			id:   id,
 			peer: peer,
 		})
@@ -133,30 +186,19 @@ func parseCompactNodesEncoding(b []byte) ([]node, error) {
 	return nodes, nil
 }
 
-func (n *node) MarshalJSON() ([]byte, error) {
-	hash := fmt.Sprintf("0x%x", n.id)
-	return json.Marshal(
-		struct {
-			ID   string `json:"id"`
-			Peer *peer  `json:"address"`
-		}{
-			hash,
-			n.peer,
-		})
-}
-
-// peer encapsulates "peer" information included in "find_node" and "get_peers" messages.
-type peer struct {
+// Peer encapsulates "peer" contact information included in "find_node" and "get_peers" messages.
+type Peer struct {
 	net.UDPAddr
 }
 
-func (p *peer) MarshalText() ([]byte, error) {
+// MarshalText encodes the Peer in text format.
+func (p *Peer) MarshalText() ([]byte, error) {
 	return []byte(p.UDPAddr.String()), nil
 }
 
 // parseCompactPeersEncoding parses contact information for peers.
-func parseCompactPeersEncoding(e []interface{}) ([]peer, error) {
-	var peers []peer
+func parseCompactPeersEncoding(e []interface{}) ([]Peer, error) {
+	var peers []Peer
 	for _, c := range e {
 		peer, err := parseCompactPeerEncoding([]byte(c.(string)))
 		if err != nil {
@@ -168,13 +210,13 @@ func parseCompactPeersEncoding(e []interface{}) ([]peer, error) {
 }
 
 // parseCompactPeerEncoding parses contact information for a single peer.
-func parseCompactPeerEncoding(b []byte) (*peer, error) {
+func parseCompactPeerEncoding(b []byte) (*Peer, error) {
 	if len(b) != 6 {
 		return nil, fmt.Errorf("compact peer encoding must be 6 bytes long")
 	}
 	ip := net.IPv4(b[0], b[1], b[2], b[3])
 	port := binary.BigEndian.Uint16(b[4:])
-	return &peer{
+	return &Peer{
 		net.UDPAddr{
 			IP:   ip,
 			Port: int(port),

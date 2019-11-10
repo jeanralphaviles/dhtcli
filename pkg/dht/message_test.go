@@ -43,6 +43,72 @@ func TestNewResponse(t *testing.T) {
 	}
 }
 
+func TestNodes(t *testing.T) {
+	cases := []struct {
+		in   *Message
+		want []Node
+		err  bool
+	}{
+		{
+			&Message{Arguments: map[string]interface{}{"nodes": "C4D4E4F5055354C0A801E*E*ii"}},
+			[]Node{{id: []byte("C4D4E4F5055354C0A801"), peer: &Peer{net.UDPAddr{IP: net.ParseIP("69.42.69.42"), Port: 26985}}}},
+			false,
+		},
+		{
+			&Message{Arguments: map[string]interface{}{"nodes": ""}, Response: map[string]interface{}{"nodes": ""}},
+			nil,
+			true,
+		},
+		{
+			&Message{Response: map[string]interface{}{"nodes": "12345"}},
+			nil,
+			true,
+		},
+	}
+	for n, c := range cases {
+		got, err := c.in.Nodes()
+		if (err != nil) != c.err {
+			t.Errorf("case %d: expected Nodes() to return error %v, got %v", n, c.err, err)
+		}
+		if !reflect.DeepEqual(got, c.want) {
+			t.Errorf("case %d: expected Nodes() = %v, got %v", n, c.want, got)
+		}
+	}
+}
+
+func TestValues(t *testing.T) {
+	cases := []struct {
+		in   *Message
+		want []Peer
+		err  bool
+	}{
+		{
+			&Message{Arguments: map[string]interface{}{"values": "*E*Eii"}},
+			[]Peer{{net.UDPAddr{IP: net.ParseIP("42.69.42.69"), Port: 26985}}},
+			false,
+		},
+		{
+			&Message{Arguments: map[string]interface{}{"values": ""}, Response: map[string]interface{}{"values": ""}},
+			nil,
+			true,
+		},
+		{
+			&Message{Response: map[string]interface{}{"values": "12345"}},
+			nil,
+			true,
+		},
+	}
+	for n, c := range cases {
+		got, err := c.in.Values()
+		if (err != nil) != c.err {
+			t.Errorf("case %d: expected Values() to return error %v, got %v", n, c.err, err)
+		}
+		if !reflect.DeepEqual(got, c.want) {
+			t.Errorf("case %d: expected Values() = %v, got %v", n, c.want, got)
+		}
+	}
+}
+
 func TestString(t *testing.T) {
 	cases := []struct {
 		got  *Message
@@ -135,9 +201,9 @@ func TestParseCompactNodesEncoding(t *testing.T) {
 	if err != nil {
 		t.Fatalf("error parsing compact nodes encoding: %v", err)
 	}
-	want := []node{{
+	want := []Node{{
 		id: []byte("ABCDEFGHIJKLMNOPQRST"),
-		peer: &peer{
+		peer: &Peer{
 			net.UDPAddr{
 				IP:   net.ParseIP("192.168.1.1"),
 				Port: 22,
@@ -145,7 +211,7 @@ func TestParseCompactNodesEncoding(t *testing.T) {
 		},
 	}, {
 		id: []byte("abcdefghijklmnopqrst"),
-		peer: &peer{
+		peer: &Peer{
 			net.UDPAddr{
 				IP:   net.ParseIP("127.0.0.1"),
 				Port: 23,
@@ -171,7 +237,7 @@ func TestParseCompactPeersEncoding(t *testing.T) {
 	if err != nil {
 		t.Fatalf("error parsing compact peers encoding: %v", err)
 	}
-	want := []peer{{
+	want := []Peer{{
 		net.UDPAddr{
 			IP:   net.ParseIP("192.168.1.1"),
 			Port: 22,
@@ -197,7 +263,7 @@ func TestParseCompactPeerEncoding(t *testing.T) {
 	if err != nil {
 		t.Fatalf("error parsing compact peer encoding: %v", err)
 	}
-	want := &peer{
+	want := &Peer{
 		net.UDPAddr{
 			IP:   net.ParseIP("127.0.0.1"),
 			Port: 23,
