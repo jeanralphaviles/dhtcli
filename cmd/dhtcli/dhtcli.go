@@ -16,35 +16,6 @@ func main() {
 	app.Version = "0.0.5"
 	app.Commands = []cli.Command{
 		cli.Command{
-			Name:  "dht",
-			Usage: "Issues requests to the BitTorrent DHT.",
-			Subcommands: []cli.Command{
-				cli.Command{
-					Name:      "find_node",
-					Usage:     "Issue a DHT 'find_node' request for the given node ID",
-					ArgsUsage: "node_id",
-					Description: "Find node is used to find the contact information " +
-						"for a node given its ID.\n\n" +
-						"   Response will contain a key \"nodes\" containing information " +
-						"for the target node and/or the closest K nodes to the target.",
-					Action: dht.FindNode,
-					// Flags aren't inherited from parent commands: https://github.com/urfave/cli/issues/795.
-					Flags: []cli.Flag{
-						cli.StringFlag{
-							Name:  "bootstrap, b",
-							Value: "router.utorrent.com:6881",
-							Usage: "Bootstrap DHT node",
-						},
-						cli.IntFlag{
-							Name:  "table_size, k",
-							Value: 8,
-							Usage: "Maximum number of nodes to keep in routing table: referenced as K value in BEP 5.",
-						},
-					},
-				},
-			},
-		},
-		cli.Command{
 			Name:  "query",
 			Usage: "Issue individual requests to a BitTorrent DHT node.",
 			Subcommands: []cli.Command{
@@ -112,6 +83,35 @@ func main() {
 						},
 					},
 					Action: query.AnnouncePeer,
+				},
+			},
+		},
+		cli.Command{
+			Name:  "dht",
+			Usage: "[Experimental] - Issues requests to the BitTorrent DHT.",
+			Subcommands: []cli.Command{
+				cli.Command{
+					Name:      "find_node",
+					Usage:     "Issue a DHT 'find_node' request for the given node ID",
+					ArgsUsage: "node_id",
+					Description: "Find node is used to find the contact information " +
+						"for a node given its ID.\n\n" +
+						"   Response will contain a key \"nodes\" containing information " +
+						"for the target node and/or the closest K nodes to the target.",
+					Action: dht.FindNode,
+					// Flags aren't inherited from parent commands: https://github.com/urfave/cli/issues/795.
+					Flags: []cli.Flag{
+						cli.StringFlag{
+							Name:  "bootstrap, b",
+							Value: "router.utorrent.com:6881",
+							Usage: "Bootstrap DHT node",
+						},
+						cli.IntFlag{
+							Name:  "table_size, k",
+							Value: 8,
+							Usage: "Maximum number of nodes to keep in routing table: referenced as K value in BEP 5.",
+						},
+					},
 				},
 			},
 		},
