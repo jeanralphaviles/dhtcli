@@ -8,8 +8,11 @@ Returns results as JSON for easy parsing.
 
 ## Installation
 
+You need to have a working Go environment with version 1.13 or greater
+[installed](https://golang.org/doc/install).
+
 ```shell
-go get -u github.com/jeanralphaviles/dhtcli
+GO111MODULE=on go get -u github.com/jeanralphaviles/dhtcli/...
 ```
 
 ## Usage
@@ -37,7 +40,7 @@ GLOBAL OPTIONS:
 ### Example
 
 ```shell
-$ go run cmd/dhtcli/dhtcli.go query get_peers router.utorrent.com:6881 E2467CBF021192C241367B892230DC1E05C0580E
+$ dhtcli query get_peers router.utorrent.com:6881 E2467CBF021192C241367B892230DC1E05C0580E
 {
   "t": "0x0d4e",
   "y": "r",
@@ -110,7 +113,7 @@ A server should respond with a single key "id", containing the queried node's
 ID.
 
 ```shell
-$ go run cmd/dhtcli/dhtcli.go query ping router.utorrent.com:6881
+$ dhtcli query ping router.utorrent.com:6881
 {
   "t": "0xc4be",
   "y": "r",
@@ -132,7 +135,7 @@ containing information for the target node, or the closest K nodes to the
 target.
 
 ```shell
-$ go run cmd/dhtcli/dhtcli.go query find_node router.utorrent.com:6881 E2467CBF021192C241367B892230DC1E05C058EE
+$ dhtcli query find_node router.utorrent.com:6881 E2467CBF021192C241367B892230DC1E05C058EE
 {
   "t": "0x54efbfbd",
   "y": "r",
@@ -193,7 +196,7 @@ in the return value. This token value is required for a future announce_peer
 query.
 
 ```shell
-$ go run cmd/dhtcli/dhtcli.go query get_peers 79.22.72.60:55455 E2467CBF021192C241367B892230DC1E05C0580E
+$ dhtcli query get_peers 79.22.72.60:55455 E2467CBF021192C241367B892230DC1E05C0580E
 {
   "t": "0x0d4e",
   "y": "r",
@@ -258,7 +261,7 @@ contain the "implied_port" setting. This setting will derive the port value
 automatically as described in BEP 5.
 
 ```shell
-$ go run cmd/dhtcli/dhtcli.go query announce_peer 79.22.72.60:55455 E2467CBF021192C241367B892230DC1E05C0580E
+$ dhtcli query announce_peer 79.22.72.60:55455 E2467CBF021192C241367B892230DC1E05C0580E
 2019/11/15 19:27:36 --token not specified, issuing get_peers request first to obtain one.
 2019/11/15 19:27:37 Got token 0x29e67ee7.
 {
@@ -285,7 +288,7 @@ and/or the closest K nodes to the target. Response will be from the closest
 node to the target.
 
 ```shell
-$ go run cmd/dhtcli/dhtcli.go dht find_node E2467CBF021192C241367B892230DC1E05C0580E
+$ dhtcli dht find_node E2467CBF021192C241367B892230DC1E05C0580E
 {
   "t": "0xefbfbdefbfbd",
   "y": "r",
