@@ -103,7 +103,7 @@ func main() {
 					Flags: []cli.Flag{
 						cli.StringFlag{
 							Name:  "bootstrap, b",
-							Value: "router.utorrent.com:6881",
+							Value: "dht.libtorrent.org:25401",
 							Usage: "Bootstrap DHT node",
 						},
 						cli.IntFlag{

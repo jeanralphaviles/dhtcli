@@ -8,11 +8,8 @@ Returns results as JSON for easy parsing.
 
 ## Installation
 
-You need to have a working Go environment with version 1.13 or greater
-[installed](https://golang.org/doc/install).
-
 ```shell
-GO111MODULE=on go get -u github.com/jeanralphaviles/dhtcli/...
+go get -u github.com/jeanralphaviles/dhtcli/...
 ```
 
 ## Usage
@@ -40,7 +37,7 @@ GLOBAL OPTIONS:
 ### Example
 
 ```shell
-$ dhtcli query get_peers router.utorrent.com:6881 E2467CBF021192C241367B892230DC1E05C0580E
+$ dhtcli query get_peers dht.libtorrent.org:25401 F09C8D0884590088F4004E010A928F8B6178C2FD
 {
   "t": "0x0d4e",
   "y": "r",
@@ -96,8 +93,8 @@ info_hash, they are returned in a key "values" as a list of strings. Values are
 in IP:Port format. If the queried node has no peers for the info_hash, a key
 "nodes" is returned containing the K closest nodes to the info_hash.
 
-Issue subsequent get_peers requests to the returned nodes until peers are
-found.
+Issue subsequent get_peers requests to the addresses of returned nodes until
+peers are found. Iterative queries are a core tenant of a distributed protocol.
 
 ## Subcommands
 
@@ -113,14 +110,14 @@ A server should respond with a single key "id", containing the queried node's
 ID.
 
 ```shell
-$ dhtcli query ping router.utorrent.com:6881
+$ dhtcli query ping dht.libtorrent.org:25401
 {
-  "t": "0xc4be",
+  "t": "0x3375",
   "y": "r",
   "r": {
-    "id": "0xebff36697351ff4aec29cdbaabf2fbe3467cc267"
+    "id": "0x1c11e01be8e78d765a2e63339fc99a66320db754"
   },
-  "v": "0x"
+  "v": "0x4c540102"
 }
 ```
 
@@ -135,7 +132,7 @@ containing information for the target node, or the closest K nodes to the
 target.
 
 ```shell
-$ dhtcli query find_node router.utorrent.com:6881 E2467CBF021192C241367B892230DC1E05C058EE
+$ dhtcli query find_node dht.libtorrent.org:25401 F09C8D0884590088F4004E010A928F8B6178C2FD
 {
   "t": "0x54efbfbd",
   "y": "r",
@@ -195,8 +192,11 @@ closest nodes to the info_hash.  In either case, a "token" key is also included
 in the return value. This token value is required for a future announce_peer
 query.
 
+Issue subsequent get_peers requests to the addresses of returned nodes until
+peers are found. Iterative queries are a core tenant of a distributed protocol.
+
 ```shell
-$ dhtcli query get_peers 79.22.72.60:55455 E2467CBF021192C241367B892230DC1E05C0580E
+$ dhtcli query get_peers dht.libtorrent.org:25401 F09C8D0884590088F4004E010A928F8B6178C2FD
 {
   "t": "0x0d4e",
   "y": "r",
@@ -261,7 +261,7 @@ contain the "implied_port" setting. This setting will derive the port value
 automatically as described in BEP 5.
 
 ```shell
-$ dhtcli query announce_peer 79.22.72.60:55455 E2467CBF021192C241367B892230DC1E05C0580E
+$ dhtcli query announce_peer 79.22.72.60:55455 F09C8D0884590088F4004E010A928F8B6178C2FD
 2019/11/15 19:27:36 --token not specified, issuing get_peers request first to obtain one.
 2019/11/15 19:27:37 Got token 0x29e67ee7.
 {
@@ -288,7 +288,7 @@ and/or the closest K nodes to the target. Response will be from the closest
 node to the target.
 
 ```shell
-$ dhtcli dht find_node E2467CBF021192C241367B892230DC1E05C0580E
+$ dhtcli dht find_node F09C8D0884590088F4004E010A928F8B6178C2FD
 {
   "t": "0xefbfbdefbfbd",
   "y": "r",
