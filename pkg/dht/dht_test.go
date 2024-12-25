@@ -164,8 +164,8 @@ func TestAnnouncePeer(t *testing.T) {
 		})
 		// Set transaction ids to be equal
 		want.TransactionID = got.TransactionID
-		if !reflect.DeepEqual(want, got) {
-			t.Errorf("case %d: expected %v, got %v", n, want, got)
+		if !reflect.DeepEqual(want, got) || err != nil {
+			t.Errorf("case %d: expected (%v, nil), got (%v, %v)", n, want, got, err)
 		}
 	}
 

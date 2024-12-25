@@ -39,9 +39,9 @@ func New(bootstrap net.UDPAddr, k int) (*QueryProcessor, error) {
 		return nil, fmt.Errorf("ping response from bootstrap node did not include id: %v", resp)
 	}
 	node := dht.Node{
-		[]byte(id.(string)),
-		&dht.Peer{
-			bootstrap,
+		ID: []byte(id.(string)),
+		Peer: &dht.Peer{
+			UDPAddr: bootstrap,
 		},
 	}
 	distance := big.NewInt(0)

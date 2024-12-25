@@ -188,7 +188,7 @@ func parseCompactNodesEncoding(b []byte) ([]Node, error) {
 
 // Peer encapsulates "peer" contact information included in "find_node" and "get_peers" messages.
 type Peer struct {
-	net.UDPAddr
+	UDPAddr net.UDPAddr
 }
 
 // MarshalText encodes the Peer in text format.

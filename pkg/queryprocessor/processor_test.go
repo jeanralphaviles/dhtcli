@@ -116,7 +116,7 @@ func TestFindNode(t *testing.T) {
 	}{
 		{
 			// FindNode called once, it's returned.
-			bootstrap: &dht.Node{Peer: &dht.Peer{*addr}},
+			bootstrap: &dht.Node{Peer: &dht.Peer{UDPAddr: *addr}},
 			target:    "4142434445464748494A4B4C4D4E4F5051525354",
 			resp:      map[string]interface{}{"nodes": "C4D4E4F5055354C0A801E*E*ii"},
 			want:      map[string]interface{}{"nodes": "C4D4E4F5055354C0A801E*E*ii"},
@@ -124,7 +124,7 @@ func TestFindNode(t *testing.T) {
 		},
 		{
 			// Already visited, response.
-			bootstrap: &dht.Node{ID: []byte("C4D4E4F5055354C0A801"), Peer: &dht.Peer{*addr}},
+			bootstrap: &dht.Node{ID: []byte("C4D4E4F5055354C0A801"), Peer: &dht.Peer{UDPAddr: *addr}},
 			target:    "4142434445464748494A4B4C4D4E4F5051525354",
 			resp:      map[string]interface{}{"nodes": "C4D4E4F5055354C0A801E*E*ii"},
 			want:      map[string]interface{}{"nodes": "C4D4E4F5055354C0A801E*E*ii"},
@@ -132,7 +132,7 @@ func TestFindNode(t *testing.T) {
 		},
 		{
 			// Target found
-			bootstrap: &dht.Node{ID: []byte("C4D4E4F5055354C0A801"), Peer: &dht.Peer{*addr}},
+			bootstrap: &dht.Node{ID: []byte("C4D4E4F5055354C0A801"), Peer: &dht.Peer{UDPAddr: *addr}},
 			target:    "4142434445464748494A4B4C4D4E4F5051525354",
 			resp:      map[string]interface{}{"nodes": "ABCDEFGHIJKLMNOPQRSTE*E*ii"},
 			want:      map[string]interface{}{"nodes": "ABCDEFGHIJKLMNOPQRSTE*E*ii"},
@@ -140,13 +140,13 @@ func TestFindNode(t *testing.T) {
 		},
 		{
 			// Target is incorrect length.
-			bootstrap: &dht.Node{ID: []byte("C4D4E4F5055354C0A801"), Peer: &dht.Peer{*addr}},
+			bootstrap: &dht.Node{ID: []byte("C4D4E4F5055354C0A801"), Peer: &dht.Peer{UDPAddr: *addr}},
 			target:    "123",
 			fail:      true,
 		},
 		{
 			// Returned node has incorrect length.
-			bootstrap: &dht.Node{Peer: &dht.Peer{*addr}},
+			bootstrap: &dht.Node{Peer: &dht.Peer{UDPAddr: *addr}},
 			target:    "4142434445464748494A4B4C4D4E4F5051525354",
 			resp:      map[string]interface{}{"nodes": "1234"},
 			fail:      true,
