@@ -37,7 +37,7 @@ GLOBAL OPTIONS:
 ### Example
 
 ```shell
-$ dhtcli query get_peers dht.libtorrent.org:25401 F09C8D0884590088F4004E010A928F8B6178C2FD
+$ dhtcli query get_peers dht.libtorrent.org:25401 DD8255ECDC7CA55FB0BBF81323D87062DB1F6D1C
 {
   "t": "0x0d4e",
   "y": "r",
@@ -132,7 +132,7 @@ containing information for the target node, or the closest K nodes to the
 target.
 
 ```shell
-$ dhtcli query find_node dht.libtorrent.org:25401 F09C8D0884590088F4004E010A928F8B6178C2FD
+$ dhtcli query find_node dht.libtorrent.org:25401 DD8255ECDC7CA55FB0BBF81323D87062DB1F6D1C
 {
   "t": "0x54efbfbd",
   "y": "r",
@@ -196,7 +196,7 @@ Issue subsequent get_peers requests to the addresses of returned nodes until
 peers are found. Iterative queries are a core tenant of a distributed protocol.
 
 ```shell
-$ dhtcli query get_peers dht.libtorrent.org:25401 F09C8D0884590088F4004E010A928F8B6178C2FD
+$ dhtcli query get_peers dht.libtorrent.org:25401 DD8255ECDC7CA55FB0BBF81323D87062DB1F6D1C
 {
   "t": "0x0d4e",
   "y": "r",
@@ -261,7 +261,7 @@ contain the "implied_port" setting. This setting will derive the port value
 automatically as described in BEP 5.
 
 ```shell
-$ dhtcli query announce_peer 79.22.72.60:55455 F09C8D0884590088F4004E010A928F8B6178C2FD
+$ dhtcli query announce_peer 79.22.72.60:55455 DD8255ECDC7CA55FB0BBF81323D87062DB1F6D1C
 2019/11/15 19:27:36 --token not specified, issuing get_peers request first to obtain one.
 2019/11/15 19:27:37 Got token 0x29e67ee7.
 {
@@ -288,7 +288,7 @@ and/or the closest K nodes to the target. Response will be from the closest
 node to the target.
 
 ```shell
-$ dhtcli dht find_node F09C8D0884590088F4004E010A928F8B6178C2FD
+$ dhtcli dht find_node DD8255ECDC7CA55FB0BBF81323D87062DB1F6D1C
 {
   "t": "0xefbfbdefbfbd",
   "y": "r",
